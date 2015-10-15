@@ -1,0 +1,3 @@
+type Sign =
+| Plus
+| Minus
