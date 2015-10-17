@@ -2,17 +2,16 @@ module VDigit
 
 open VList
 
-val isDigit: int * int -> Tot bool
-let isDigit (v, s) = v < s && 0 < v
+type nat0 = x:int{x>=0}
+type nat1 = x:int{x>=1}
 
-type vDigit = t:(int * int) {isDigit t}
+val isDigit: nat0 * nat1 -> Tot bool
+let isDigit (v, s) = v < s
+
+type vDigit = t:(nat0 * nat1) {isDigit t}
 
 val sum: vDigit -> vDigit -> Tot vDigit
 let sum = function
   | (v1, s1) -> function
   | (v2, s2) -> ((v1 + v2), (s1 + s2))
-
-val reduce: (int -> int) -> vDigit -> x:Tot (vList vDigit) {x <> VEmpty}
-let reduce rule = 
-  VCons (v, rule level) VEmpty
 

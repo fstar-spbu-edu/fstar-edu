@@ -1,17 +1,31 @@
-﻿module VNatural
+module VNatural
 
 open VList
 open VDigit
 
-type vNatural = x:(vList vDigit){x <> VEmpty /\ x <> VCons 0 _}
+val isNatural: vList vDigit -> Tot bool
+let isNatural = function
+  | VEmpty         -> false
+  | VCons (0, _) _ -> false
+  | _              -> true
+  
+type vNatural = x:(vList vDigit){isNatural x}
 
-val sum: vNatural -> vNatural -> Tot vNatural
-let sum a b =
-  let rA = rev a
-  let rB = rev b
-  let rSum = function
-    | VEmpty -> fun b -> b
-    | VCons h t -> function
-      | Vempty      -> VCons h t
-      | VCons hh tt -> (VDigit.sum h hh) (rSum t tt)
-  rev (rSum rA rB)
+val isDecimal: vList vDigit -> Tot bool
+let rec isDecimal = function
+  | VEmpty          -> true
+  | VCons (_, 10) t -> isDecimal t
+  | VCons _ _       -> false
+
+type vDecimal = x:vNatural{isDecimal x}
+
+val sum: vDecimal -> vDecimal -> vDecimal
+let sum a b = rev (fold2 (rev a) (rev b) (VCons (0, 10) VEmpty) (fun a b c -> match a with
+  | VCons (vc, 10) t -> match b with
+    | VNone -> match c with
+      | VNone          -> VCons (0,                   10) (VCons (           vc,       10) t)
+      | VSome (vb, 10) -> VCons ((     vb + vc) / 10, 10) (VCons ((     vb + vc) % 10, 10) t)
+    | VSome (va, 10) -> match c with
+      | VNone          -> VCons ((va +      vc) / 10, 10) (VCons ((va +      vc) % 10, 10) t)
+      | VSome (vb, 10) -> VCons ((va + vb + vc) / 10, 10) (VCons ((va + vb + vc) % 10, 10) t)))
+
