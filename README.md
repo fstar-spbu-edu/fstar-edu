@@ -5,13 +5,13 @@ For build on Windows may used build.bat
 Structure of folders:
 - build.bat
 - compiler
-  - <name>-<version>-<processor>-<os>
+  - `<name>-<version>-<processor>-<os>`
     - ...
 - tasks
-  - <year>.<group>
-    - <name>
+  - `<year>.<group>`
+    - `<name>`
       - build.bat
       - fstar
-        - <name>.fst
+        - `<name>`.fst
       - fsharp | only for generation
-        - <name>.fs
+        - `<name>`.fs
