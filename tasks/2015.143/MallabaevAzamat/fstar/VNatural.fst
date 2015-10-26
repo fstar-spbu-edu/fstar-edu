@@ -4,29 +4,33 @@ open VDigit
 open VList
 
 val isNatural: vList vDigit -> Tot bool
-let isNatural = function
-  | VEmpty         -> false
-  | VCons (0, _) _ -> false
-  | _              -> true
+let rec isNatural = function
+  | VEmpty    -> false
+  | VCons _ t -> true
   
 type vNatural = x:(vList vDigit){isNatural x}
 
-val isDecimal: vList vDigit -> Tot bool
+val isNotNull: vNatural -> Tot bool
+let rec isNotNull = function
+  | VCons (0, _) VEmpty -> false
+  | VCons (0, _) t      -> isNotNull t
+  | _                   -> true
+
+val isDecimal: vNatural -> Tot bool
 let rec isDecimal = function
-  | VEmpty          -> true
-  | VCons (_, 10) t -> isDecimal t
-  | VCons _ _       -> false
+  | VCons (_, 10) VEmpty -> true
+  | VCons (_, 10) t      -> isDecimal t
+  | _                    -> false
 
 type vDecimal = x:vNatural{isDecimal x}
 
-(*
-val sum: vDecimal -> vDecimal -> vDecimal
-let sum a b = rev (fold2 (rev a) (rev b) (VCons (0, 10) VEmpty) (fun a b c -> match a with
-  | VCons (vc, 10) t -> match b with
-    | VNone -> match c with
-      | VNone          -> VCons (0,                   10) (VCons (           vc,       10) t)
-      | VSome (vb, 10) -> VCons ((     vb + vc) / 10, 10) (VCons ((     vb + vc) % 10, 10) t)
-    | VSome (va, 10) -> match c with
-      | VNone          -> VCons ((va +      vc) / 10, 10) (VCons ((va +      vc) % 10, 10) t)
-      | VSome (vb, 10) -> VCons ((va + vb + vc) / 10, 10) (VCons ((va + vb + vc) % 10, 10) t)))
-*)
+val inc: vDecimal -> Tot vDecimal
+let rec inc = function
+  | VCons (9, 10) VEmpty -> VCons (0, 10)    (VCons (1, 10) VEmpty)
+  | VCons (9, 10) t      -> VCons (0, 10)    (inc t)
+  | VCons (x, 10) t      -> VCons (x + 1, 10) t
+
+val dec: x:vDecimal{isNotNull x} -> Tot vDecimal
+let rec dec = function
+  | VCons (0, 10) t -> VCons (9, 10)    (dec t)
+  | VCons (x, 10) t -> VCons (x - 1, 10) t
