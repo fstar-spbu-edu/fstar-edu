@@ -24,13 +24,14 @@ let rec isDecimal = function
 
 type vDecimal = x:vNatural{isDecimal x}
 
-val inc: vDecimal -> Tot vDecimal
+val inc: vNatural -> Tot (x:vNatural{isNotNull x})
 let rec inc = function
-  | VCons (9, 10) VEmpty -> VCons (0, 10)    (VCons (1, 10) VEmpty)
-  | VCons (9, 10) t      -> VCons (0, 10)    (inc t)
-  | VCons (x, 10) t      -> VCons (x + 1, 10) t
+  | VCons (v, s) VEmpty -> if v = s - 1 then VCons (0, s) (VCons (1, s) VEmpty)
+                                        else VCons (v + 1, s)           VEmpty
+  | VCons (v, s) t      -> if v = s - 1 then VCons (0, s) (inc t)
+                                        else VCons (v + 1, s)  t
 
-val dec: x:vDecimal{isNotNull x} -> Tot vDecimal
+val dec: x:vNatural{isNotNull x} -> Tot vNatural
 let rec dec = function
-  | VCons (0, 10) t -> VCons (9, 10)    (dec t)
-  | VCons (x, 10) t -> VCons (x - 1, 10) t
+  | VCons (0, s) t -> VCons (s - 1, s) (dec t)
+  | VCons (x, s) t -> VCons (x - 1, s)      t
