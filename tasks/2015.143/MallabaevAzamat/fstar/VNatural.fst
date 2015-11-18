@@ -35,3 +35,6 @@ val dec: x:vNatural{isNotNull x} -> Tot vNatural
 let rec dec = function
   | VCons (0, s) t -> VCons (s - 1, s) (dec t)
   | VCons (x, s) t -> VCons (x - 1, s)      t
+
+val sum: vNatural -> vNatural -> vNatural
+let rec sum a b = if isNotNull a then inc (sum (dec a) b) else b
